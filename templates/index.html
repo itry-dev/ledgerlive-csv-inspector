@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledger Live Csv Inspector</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+</head>
+<body>
+    <div class="ui container">
+        <h1 class="ui header">Ledger Live Csv Inspector</h1>
+
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            {% endwith %}
+
+        {% if upload_file_enabled %}
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <label for="file">Upload CSV File:</label>
+            <input type="file" name="file" id="file" accept=".csv">
+            <input type="submit" value="Upload">
+        </form>
+        {% endif %}
+
+        {% if tickers is sequence and tickers|length > 0 %}
+        <form method="GET" action="/" id="frm">
+            <div class="ui form">
+                <div class="field">
+                    <label>Select Currency Ticker</label>
+                    <select name="ticker" class="ui dropdown" onchange="_doFormPost(this)">
+                        <option value="all">All Tickers</option>
+                        {% for ticker in tickers %}
+                        <option value="{{ ticker }}" {% if selected_ticker == ticker %}selected{% endif %}>{{ ticker }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+
+        {% if data is sequence and data|length > 0 %}
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Currency Ticker</th>
+                    <th>Operation Date</th>
+                    <th>Operation Amount</th>
+                    <th>Operation Fees</th>
+                    <th>Countervalue at Operation Date</th>
+                    <th>Countervalue at CSV Export</th>                    
+                    <th>Operation Type</th>                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row['Currency Ticker'] }}</td>
+                    <td>{{ row['Operation Year'] }}</td>
+                    <td>{{ row['Operation Amount'] }}</td>
+                    <td>{{ row['Operation Fees'] }}</td>
+                    <td>{{ "{:.2f}".format(row['Countervalue at Operation Date']) }}</td>
+                    <td>{{ "{:.2f}".format(row['Countervalue at CSV Export']) }}</td>
+                    <td>{{ row['Operation Type'] }}</td>                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="ui message">
+            <div class="header">No data available</div>
+            {% if tickers is sequence and tickers|length > 0 %}
+            <p>Please select a currency ticker from the dropdown above.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+
+    <script>
+        var frm = document.getElementById('frm')
+        function _doFormPost(ddl) {
+            frm.submit()
+        }
+    </script>
+
+</body>
+</html>

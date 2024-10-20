@@ -1,0 +1,7 @@
+services:
+  flask-app:
+    build:
+      context: .  # Use the current directory as context
+    image: legnagolibera/ledgerlive-csv-insperctor:latest
+    ports:
+      - "5000:5000"  # Map the host port to the container port
